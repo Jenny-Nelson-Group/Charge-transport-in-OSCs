@@ -1,7 +1,0 @@
-%nprocshared=1
-%Mem=8GB
-#p opt b3lyp/6-31g* nosymm 
-
-Optimise structure
-
-0 1
