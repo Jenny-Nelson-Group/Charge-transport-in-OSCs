@@ -54,7 +54,7 @@ echo -en "\n" >> MoleculeX_J.com
 
 N.B. HEADER_Js contains the line 
 
-# b3lyp nosymm punch=mo iop(3/33=1)
+\# b3lyp nosymm punch=mo iop(3/33=1)
 	nosymm is necessary to prevent reorientation of molecule to standard orientation.
 	punch=mo puts orbital coefficients in fort.7.  This must be moved to xxx_x.pun 
 	iop(3/33=1) forces output of the overlap matrix in the xxx_x.log file
