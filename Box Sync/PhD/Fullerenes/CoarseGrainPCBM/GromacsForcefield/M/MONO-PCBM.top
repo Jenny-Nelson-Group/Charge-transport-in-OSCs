@@ -1,0 +1,53 @@
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+  1             2               yes              1.0     1.0
+
+[ atomtypes ]
+;type    mass    charge       ptype          sigma      epsilon
+ C60    720.60   0.00           A           0.89535     26.822830
+ ;sigma from fitting atomistic RDF JMF 2012-01-10
+ PBM	190.00	 0.00		    A	        0.7037		    10.0
+
+; Potential in form of: V_LJ = 4 * epsilon ((sigma/r)^12 - (sigma/r)^6)
+;   i.e. epsilon is strength of potential
+;        sigma is point at which LJ becomes repulsive.
+
+;Units in gromacs for Sigma are nm, for Epsilon are kJ/mol - see page 88 of Manual 3.3
+;Parameters for Coarse Grained C60 taken from Table 2 in PRB,LA Girifalco, Volume 62, Number 19, 15th Nov 2000
+; R_0 = 10.05 Angstrom, epsilon = 0.278 eV
+;1eV = 96.485 kJ/mol
+
+;6 x carbon phenyl ring = 72.06
+;5 x carbon aliphatic = 60.05
+; O x 2 = 32
+; CH3 = 15.01
+;Or something like that, JMF 2-12-08
+
+
+[ moleculetype ]
+; name  nrexcl
+MONO-PCBM	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+
+[ system ]
+; Name
+PCBM_coarse_grained
+
+[ molecules ]
+; Compound        #mols
+MONO-PCBM               1000 
+
+

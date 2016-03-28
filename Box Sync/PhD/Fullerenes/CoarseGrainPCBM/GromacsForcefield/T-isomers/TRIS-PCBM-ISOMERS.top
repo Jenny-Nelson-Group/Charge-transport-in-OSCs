@@ -1,0 +1,1563 @@
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+  1             2               yes              1.0     1.0
+
+[ atomtypes ]
+;type    mass    charge       ptype          sigma      epsilon
+ C60    720.60   0.00           A           0.89535     26.822830
+ ;sigma from fitting atomistic RDF JMF 2012-01-10
+ PBM	190.00	 0.00		    A	        0.7037		    10.0
+
+; Potential in form of: V_LJ = 4 * epsilon ((sigma/r)^12 - (sigma/r)^6)
+;   i.e. epsilon is strength of potential
+;        sigma is point at which LJ becomes repulsive.
+
+;Units in gromacs for Sigma are nm, for Epsilon are kJ/mol - see page 88 of Manual 3.3
+;Parameters for Coarse Grained C60 taken from Table 2 in PRB,LA Girifalco, Volume 62, Number 19, 15th Nov 2000
+; R_0 = 10.05 Angstrom, epsilon = 0.278 eV
+;1eV = 96.485 kJ/mol
+
+;6 x carbon phenyl ring = 72.06
+;5 x carbon aliphatic = 60.05
+; O x 2 = 32
+; CH3 = 15.01
+;Or something like that, JMF 2-12-08
+
+
+[ moleculetype ]
+; name  nrexcl
+C1	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   36.0    4e+05
+2   1   3   1   36.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C2	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   36.0    4e+05
+2   1   3   1   60.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C3	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   36.0    4e+05
+2   1   3   1   72.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C4	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   60.0    4e+05
+2   1   3   1   60.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C5	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   60.0    4e+05
+2   1   3   1   72.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C6	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   60.0    4e+05
+2   1   3   1   90.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C7	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   72.0    4e+05
+2   1   3   1   90.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C8	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   72.0    4e+05
+2   1   3   1   108.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C9	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   90.0    4e+05
+2   1   3   1   108.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C10	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   90.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C11	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C12	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C13	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   120.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C14	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   120.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C15	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   144.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+C16	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   36.0    4e+05
+3   1   4   1   144.0    4e+05
+2   1   3   1   180.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D1	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   60.0    4e+05
+2   1   3   1   108.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D2	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   60.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D3	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   72.0    4e+05
+2   1   3   1   72.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D4	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   72.0    4e+05
+2   1   3   1   90.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D5	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   72.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D6	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   90.0    4e+05
+2   1   3   1   108.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D7	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   90.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D8	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   108.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D9	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D10	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   120.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D11	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   120.0    4e+05
+2   1   3   1   180.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+D12	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   60.0    4e+05
+3   1   4   1   144.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+CE1	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   72.0    4e+05
+3   1   4   1   72.0    4e+05
+2   1   3   1   108.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+CE2	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   72.0    4e+05
+3   1   4   1   72.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+CE3	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   72.0    4e+05
+3   1   4   1   90.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+CE4	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   72.0    4e+05
+3   1   4   1   90.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+CE5	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   72.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+CE6	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   72.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   180.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+CE7	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   72.0    4e+05
+3   1   4   1   120.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+CE8	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   72.0    4e+05
+3   1   4   1   144.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+EEE	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   90.0    4e+05
+3   1   4   1   90.0    4e+05
+2   1   3   1   90.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+EET1	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   90.0    4e+05
+3   1   4   1   90.0    4e+05
+2   1   3   1   180.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+ET2	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   90.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+ET3	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   90.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+ET4	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   90.0    4e+05
+3   1   4   1   120.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+TTT1	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   108.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   108.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+TTT2	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   108.0    4e+05
+3   1   4   1   108.0    4e+05
+2   1   3   1   144.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+TTT3	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   108.0    4e+05
+3   1   4   1   120.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ moleculetype ]
+; name  nrexcl
+TTT4	  1
+
+[ atoms ]
+;   nr   type   resnr  residu  atom    cgnr    charge
+    1    C60   1      	MONO-PCBM    C     1        0.0
+    2	 PBM	1	MONO-PCBM	P	1	0.0
+    3	 PBM	1	MONO-PCBM	P	1	0.0
+    4	 PBM	1	MONO-PCBM	P	1	0.0
+
+
+[ bonds ]
+; BOND LENGTH HERE
+; bond length from avg. length of first peak in C-P atomistic CoM RDF from Atomistic study:
+; JMF 2011-01 PCBM-CG/monoPCBM_redo_2011-01/2564_PCBM_atomistic
+   1	2	1	0.64	1e+06
+   1    3   1   0.64    1e+06
+   1    4   1   0.64    1e+06
+
+[ exclusions ]
+1   2   ; stop C60 interacting with its own PBM
+1   3
+1   4
+2   3
+2   4
+3   4
+
+[ angles ]
+3   1   2   1   120.0    4e+05
+3   1   4   1   120.0    4e+05
+2   1   3   1   120.0    4e+05
+
+[ system ]
+; Name
+PCBM_coarse_grained
+
+[ molecules ]
+; Compound        #mols
+
+C1 22
+C2 22
+C3 22
+C4 22
+C5 22
+C6 22
+C7 22
+C8 22
+C9 22
+C10 22
+C11 22
+C12 22
+C13 22
+C14 22
+C15 22
+C16 22
+D1 22
+D2 22
+D3 22
+D4 22
+D5 22
+D6 22
+D7 22
+D8 22
+D9 22
+D10 22
+D11 22
+D12 22
+CE1 22
+CE2 22
+CE3 22
+CE4 22
+CE5 22
+CE6 22
+CE7 22
+CE8 22
+EEE 32 
+EET1 22
+ET2 22
+ET3 22
+ET4 22
+TTT1 22
+TTT2 22
+TTT3 22
+TTT4 22
