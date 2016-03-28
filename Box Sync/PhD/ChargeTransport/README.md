@@ -6,7 +6,7 @@ The following inputs are required:
 
 1. Name for output file
 
-2. Locationsfile of xyz coordinates of atoms in molecule
+2. Locationsfile of xyz coordinates centres of molecules in crystal
 
 3. Jfile of electronic couplings between molecules, given in rows of $molecule1 $molecule2 $J
 
