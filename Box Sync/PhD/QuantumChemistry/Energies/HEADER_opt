@@ -1,0 +1,7 @@
+%nprocshared=16
+%Mem=8GB
+#p opt b3lyp/6-31g(d) geom=connectivity 
+
+Optimise structure
+
+0 1

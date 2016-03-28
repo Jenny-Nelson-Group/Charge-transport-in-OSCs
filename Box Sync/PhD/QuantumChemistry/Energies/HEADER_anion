@@ -1,0 +1,7 @@
+%nprocshared=8
+%Mem=8GB
+#p sp b3lyp/6-31g* SCF(Tight,Conver=8) Integral(Grid=UltraFine) geom=connectivity 
+
+SP anion
+
+-1 2
