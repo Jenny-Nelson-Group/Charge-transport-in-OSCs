@@ -1,0 +1,7 @@
+%nprocshared=1
+%Mem=8GB
+#p b3lyp/6-31g* nosymm iop(3/33=1,6/7=3) 
+
+Find some Js; yes please.
+
+0 1
