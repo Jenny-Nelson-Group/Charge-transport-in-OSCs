@@ -9,3 +9,9 @@ Scripts and codes for calculating the transfer integral (electronic coupling) J 
 - The folder OriginalCounterpoiseMethod contains the original python code for calculating with the counterpoise method
 
 - The folder CounterpoiseMethod contains the updated (Python) codes for calculating J with the counterpoise method
+
+------------------------------------------------------------------------------
+
+The script launch_coms.sh runs a Gaussian com file on cx1 at Imperial College. The file HEADER_opt can be appended to a molecule xyz file for an optimisation with Gaussian.
+
+
