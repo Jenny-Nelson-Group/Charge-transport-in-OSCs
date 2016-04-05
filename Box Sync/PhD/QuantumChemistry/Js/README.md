@@ -1,6 +1,6 @@
 # Calculate J
 
-Calculating transfer integrals with Gaussian and the projective method.
+Calculating transfer integrals with Gaussian and the projective method. For a python script of this process see folder ProjectiveMethod, and for the Counterpoise method, see folder CounterpoiseMethod. 
 
 Adapted from code by J.Kirkpatrick to deal with GAMESS-UK output; joejk2 12/09/07, with edits from Jarvist Frost and Beth Rice
 
