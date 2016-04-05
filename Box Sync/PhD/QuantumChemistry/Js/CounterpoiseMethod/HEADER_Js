@@ -1,0 +1,7 @@
+%nproc=1
+%mem=100Mb
+#p IOp(6/7=3) b3lyp/6-31g* nosymm
+
+autogen
+
+0 1
