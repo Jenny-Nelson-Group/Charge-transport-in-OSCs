@@ -1,262 +1,204 @@
 #!/usr/bin/env python
 
+# Calculate the mobility given a crystal structure and the electronic couplings (Js) from the central unit cell to all others in a 3x3x3 supercell. The J file should be in the format $i $j J, where $i and $j are the indices for each molecule, and this code is set up the take advantage of the symmetry in a crystal and duplicate the Js between additional unit cells. The codes Transform_molecules.py and Translate_molecules.py can be used to make up the unit cells, given symmetry operations for the crystal structure. 
+
+# The code works by using the populated J matrix to find the corresponding rates in the prescence of an electric field (although field strength can be set to zero and the mobility calculated via the Einstein relation). 
+
+# A master equation for rates is then set up and solved: AP=0, where A is the rate matrix containing the sum of all rates away from a molecule on the diagonal and the rate to each other molecule on the off diagonals. This is used to find the velocity, which can then be used to find the mobility via the field.
+
+# The diffusion coefficient is calculated with a model based on a random walk, which is converted to a mobility with the Einstein relation.
+
+
+
 import numpy as np
 import matplotlib.pyplot as pl
 import scipy
 from scipy import linalg, matrix
+from scipy.sparse.linalg import svds
 import sys
+from sympy import Matrix
 
 
+# ----------------  Define null space function for solving AP=0 ------------------ # 
 
-#Define null space function
-def null(X,eps=1e-5):
+def null(X,eps=1e-12):
     Solution=0
-    u, s, vh = scipy.linalg.svd(X)                      #Single value decomposition
+    u, s, vh = scipy.linalg.svd(X)     # Single value decomposition
     null_mask = (np.absolute(s) <= eps)
-    #print null_mask
-    if not all(null_mask)==False:
-        #print "Solution not found"
-        return np.zeros(M)
-    null_space = scipy.compress(null_mask, vh, axis=0)  #Find corresponding vectors
+
+    null_space = scipy.compress(null_mask, vh, axis=0)  # Find corresponding vectors
+
     n,m=np.shape(null_space)
-#print n,m
-    for i in range(0,n):                                #Choose only solutions that
-        positive=np.greater_equal(null_space[i,:],np.zeros(m))#can be probabilities
+    for i in range(0,n):           # Choose only solutions that can be probabilities
+        positive=np.greater_equal(null_space[i,:],np.zeros(m))     
         negative=np.less_equal(null_space[i,:],np.zeros(m))
-        if (np.all(positive)==True or np.all(negative)==True): 	   #Ensure sum(Pi)=1
-            #print null_space[i,:]
+        if (np.all(positive)==True or np.all(negative)==True): 	   # Ensure sum(Pi)=1
             Solution=np.absolute(null_space[i,:])
             Solution=Solution/np.sum(Solution)
     return scipy.transpose(Solution)
 
-
-#Plot rate distribution to check
-def PlotRates(X):
-	logX=np.zeros((N,N))
-	for i in range(0,N):
-		for j in range(0,N):
-			if X[i,j]!=0:
-				logX[i,j]=np.log10(np.absolute(X[i,j]))
-	logX=logX[np.nonzero(logX)]
-    #print logX
-	hist_logX,bins=np.histogram(logX,bins=100)
-    #print bins
-	fig=pl.figure()
-	pl.bar(bins[0:99],hist_logX[0:99],width=0.01)
-	pl.show()
-
-    #fig.savefig("%s_dist.pdf"%(J_name))
+# ------------------- Find matching rows (for populating full J matrix ------------ #
 
 
-#-------------------------------------------------------------------------------#
+def find_rows(a, b):
+    
+    row_match = np.array(np.all((np.isclose(a[:,None,:],b[None,:,:],rtol=1e-3,atol=1e-10)),axis=-1).nonzero()).T.tolist()
 
 
-#Load data
-N=int(sys.argv[1])
-J_name=sys.argv[2]
-Jif=np.loadtxt(sys.argv[2])
-coordfile=np.loadtxt(sys.argv[3])
-a=float(sys.argv[4])
-b=float(sys.argv[5])
-c=float(sys.argv[6])
-F_mag=float(sys.argv[7])
-f1=float(sys.argv[8])*F_mag
-f2=float(sys.argv[9])*F_mag
-f3=float(sys.argv[10])*F_mag
-angle=float(sys.argv[11])
+    return row_match 
 
-#Define variables
-A=np.zeros((N,N))
-Lambda_inner=0.1
+
+#-------------------------------- Main Code ------------------------------------- #
+
+
+# Load data
+
+N=int(sys.argv[1])                # Number of molecules
+coordfile=np.loadtxt(sys.argv[2]) # read in coordinate file (in Angstroms)
+Jif=np.loadtxt(sys.argv[3])		  # Read in J file (with columns $i $j J)
+F_mag=float(sys.argv[4])          # Magnitude of field vector (in V/cm). Set to zero for no field.
+theta=np.radians(float(sys.argv[5]))         # Angles to define direction of field
+phi=np.radians(float(sys.argv[6]))
+
+# Define constants
+
+A=np.zeros((N,N))              # Initialise rate matrix
+Lambda_inner=0.1               # Define inner and outer reorganisation energies
 Lambda_outer=0.2
-hbar=6.582*10**-16
-e=1
-kb=8.617*10**-5
-T=300
-M=N/27      # m is number of molecules in unit cell
+hbar=6.582*10**-16             # in eV.s
+e=1                            # Charge on electron in eV/V 
+kb=8.617*10**-5				   # in eV/K
+T=300                          # in K
+M=N/27      				   # M = number of molecules in unit cell (for 3x3x3 supercell)
 
-#print "m= ", M
+#print "M= ", M
 
-F=[f1,f2,f3]       #In V/cm
+# Define cartesian coordinates of field vector (assuming from origin)
 
-#F=[0,0,0]
+F=[F_mag*np.sin(phi)*np.cos(theta),F_mag*np.sin(phi)*np.sin(theta),F_mag*np.cos(phi)]                   
 
-F_MAG=np.linalg.norm(F)
+#print "Field: ", F
 
-#print "F_MAG is: ", F_MAG
+F_MAG=np.linalg.norm(F)        # Calculate magnitude of field (= F_mag)
 
-Lambda=Lambda_inner+Lambda_outer
+Lambda=Lambda_inner+Lambda_outer  # Calculate total lambda
 
-
-#print "F= ", F, "V/cm"
-
-cell= [ [a, 0.0, 0.0],
-        [0.0, b, 0.0],
-        [0.0, 0.0, c] ]
-
-
-#Enantiopure exp
-#cell= [  [16.542,         0.0000000000,         0.0000000000,],
- #      [0.0000000000,        15.035,         0.0000000000,],
- #      [-5.15855,         0.0000000000,        13.1326] ]
-
-
-
-#print "J file: ", Jif
 
 Size=len(Jif[:,2])
-
-#print "Size of J file: ", Size
 
 orderedJs=np.argsort(Jif[:,2])
 
 #print "Top Js: ", Jif[orderedJs[Size-10:Size],2], "at", Jif[orderedJs[Size-10:Size],0], Jif[orderedJs[Size-10:Size],1]
 
-J=np.zeros((N,N))
+J=np.zeros((N,N))              # Set up Js in matrix
 
 for i in range(0,Size): 
     J[Jif[i,0],Jif[i,1]]=Jif[i,2]
 
-#print np.unique(J)
-#print len(np.unique(J))
+# Convert from Angstroms to cm
 
+#print "Non zero Js: ", np.count_nonzero(J)
 
-#PBCs
+coordfile=coordfile*10**-8
 
-PBCs=False
+distancematrix=coordfile[:,None,...]-coordfile[None,...]
 
-#print coordfile
-
-if PBCs==True:
-	coordfile=np.inner(np.linalg.inv(cell),coordfile).T   #scale to fractional coordinates
-	#print coordfile
-	distancematrix=coordfile[:,None,...]-coordfile[None,...]
-	distancematrix[distancematrix<0.5]+=1.0 #minimum image convention
-	distancematrix[distancematrix>0.5]-=1.0
-	distancematrix=np.inner(distancematrix,cell).T # scale back to real coordinates
-	coordfile=np.inner(coordfile,cell).T
-	distancematrix=distancematrix.T
-else: distancematrix=coordfile[:,None,...]-coordfile[None,...] 
-
-#print "Distance Matrix", distancematrix
-
-#print "J", J
-
-#PlotRates(J)
-
-#Calculate matrix of rates
-for i in range(0,N):
-    for j in range(0,N):
-        if (i!=j): #and np.absolute(Jif[i,j])>10e-5):
-            #J[i,j]=J[j,i]
-            deltaE=0
-            d=distancematrix[i,j,:]
-            #print "d= ", d
-            field=np.dot(F,d)
-            #print "field= ", field
-            A[i,j]=((J[i,j]*J[i,j]))*((np.pi/(Lambda*kb*T))**0.5)*np.exp(-(((deltaE-field)+Lambda)**2)/(4*Lambda*kb*T))
-#print A[i,j]
-
-#print "J: ", len(J[np.nonzero(J)])
-
-#print "A: ", len(A[np.nonzero(A)])
+#print "Distance matrix: ", np.shape(distancematrix)
 
 # Find sites in 1st unit cell (by finding rows of matrix containing more than a critical value of non-zeros)
 
 unit_cell_sites=[]
 
 for i in range(0,N):
-    if len(A[np.nonzero(A[i,:])])>M:
-        unit_cell_sites=np.append(unit_cell_sites,[i])
+    if len(J[np.nonzero(J[i,:])])>M+1:
+    	unit_cell_sites=np.append(unit_cell_sites,[i])
 
-unit_cell_sites = [int(x) for x in unit_cell_sites]           # Set elements as integers
+unit_cell_sites = [int(x) for x in unit_cell_sites]      # Set elements as integers
 
-#unit_cell_sites=[0,1,2,3]
+unit_cell_vecs=np.zeros((N,N,3))
+rest_distance_matrix=np.zeros((N,N,3))
 
-#print unit_cell_sites
+unit_cell_vecs[0:M,:,:]=distancematrix[0:M,:,:]
+rest_distance_matrix[M+1:N,:,:]=distancematrix[M+1:N,:,:]
 
-# Set up matrix to solve for Ps
+for i in range(0,M):
+	for j in range(M+1,N):
+		J_match = find_rows(unit_cell_vecs[i,:,:],rest_distance_matrix[j,:,:])
+		if unit_cell_vecs[i,J_match[0][0],:].all()!=0:
+			for match in range(0,len(J_match)):
+				if i!=match:
+					J[j,J_match[match][1]]=J[i,J_match[match][0]]
+					J[J_match[match][1],j]=J[J_match[match][0],i]
+				#print "J= ", J[i,J_match[match,0]], "for ", unit_cell_vecs[i,J_match[match,0],:]
 
-Mat=np.zeros((M,M))
-
-for i in unit_cell_sites:
-    Mat[i%M,i%M]=-np.sum(A[i,:])     # Fill diagonal with sum of rates away from molecule
-    for j in range(0,N):
-        Mat[i%M,j%M]+=A[j,i]
-
-#P=np.zeros(N)
-
-#P.fill(1./N)
-
-#print A_cell
-
-P= null(Mat)
-#print "P= ", P
-
-P_all=np.zeros(N)
-
-for i in range(0,N):
-    P_all[i]=P[i%M]/(N/4)
+#print "Non-zero Js after filling: ", np.count_nonzero(J)
 
 
-#print "P_all: ", P_all
-
-#tile_P=np.tile(P,(N+1)/4) 
-#P=tile_P/((N+1)/4)
-#print P
-#print sum(P_all)
-
-#print "AP= ", np.inner(A,P)
-
-r=np.zeros((N,N))
+# Calculate matrix of rates
 
 for i in range(0,N):
     for j in range(0,N):
-        if i!=j:
-            r[i,j]=np.linalg.norm(distancematrix[i,j,:])
+        if (i!=j):
+            deltaE=0
+            d=distancematrix[i,j,:]
+            field=np.dot(F,d)
+            #print "field= ", field
+            A[i,j]=((J[i,j]*J[i,j]))*((np.pi/(Lambda*kb*T))**0.5)*np.exp(-(((deltaE-field)+Lambda)**2)/(4*Lambda*kb*T))
+            #print A[i,j]
 
-#print "Distance: ", r
 
-V=np.zeros(3)
+for i in range(0,N):
+	A[i,i]=-np.sum(A[:,i])
+
+#print "A: ", A, "Non-zero: ", np.count_nonzero(A)
+
+
+P_all=null(A)
+
+#print "P: ", P_all
+
+
+# Matrix of distances
+
+r=np.apply_along_axis(np.linalg.norm,2,distancematrix)  
+
+
+# -----Mobility from velocity (can only be calculated in prescence of a field ----- #
+
+if F_MAG!=0:
+
+	V=np.zeros(3)       # Find velcocity vector
+
+	for i in range(0,N):
+		for j in range(0,N):
+			if i!=j:
+				V+=distancematrix[i,j,:]*A[i,j]*P_all[i]
+
+
+	V_F=np.dot(V,(F/F_MAG))       # V in direction of field
+
+	mu = (V_F/F_MAG)/hbar                # Mobility in cm^2/Vs
+
+	#print "At theta=",theta, ", phi=", phi , " Mobility= ", mu, "cm^2 / Vs"
+
+	print theta, phi, mu
+
+
+# ---------------------- Mobility from Einstein relation ------------------------- #
+
+# Calculate D. Initialise.
+
+D=0
+
+# Unit vector to calculate mobility in the direction of
+
+unit_vec = [np.sin(phi)*np.cos(theta),np.sin(phi)*np.sin(theta),np.cos(phi)]  
 
 for i in range(0,N):
     for j in range(0,N):
-        if i!=j:
-	    V+=distancematrix[i,j,:]*A[i,j]*P_all[j]
+        D+=0.5*P_all[i]*A[j,i]*(np.dot(distancematrix[j,i,:],unit_vec))**2
 
-#print "v= ", V
-
-mu=0
-
-#for i in range(0,N):
-#    for j in range(0,N):
-#        if i!=j:
-#            mu+=P_all[i]*A[j][i]*np.dot(distancematrix[j,i,:],(F/F_MAG))
-
-#mu=mu/F_MAG
-
-#print "mu= ", mu*10**-16
-
-#Calculate D
-#D=0
-#Unit vector to calculate mobility on the direction of
-#vec=F
-#unit_vec=vec/np.linalg.norm(vec)
-
-#for i in range(0,N):
-#    for j in range(0,i):
-#        if i!=j:
-#            D+=0.5*P[i]*A[j,i]*(np.dot(distancematrix[j,i,:],unit_vec))**2
-
-
-V_F=np.dot(V,(F/F_MAG))       #V in direction of field
-
-print angle,((V_F/F_MAG)*10**-16)/hbar
-
-#print "angle: ", angle , "mobility: ", (V_F/F_MAG)*10**-16
-
-#print "Mobility= ", mu, "cm^2 / Vs"
-
-#print "Mobility from Einstein relation= ", (e*D)/(kb*T) , "cm^2 / Vs"
+mu_ein= ((e*D)/(kb*T))/hbar
+#print "At theta=",theta, ", phi=", phi, "Mobility from Einstein relation= ",mu_ein, "cm^2 / Vs"
 
 

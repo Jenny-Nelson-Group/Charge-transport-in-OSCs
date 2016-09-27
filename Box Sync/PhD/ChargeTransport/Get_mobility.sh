@@ -3,30 +3,34 @@
 Name=$1
 Locationsfile=$2
 Jfile=$3
-Fieldfile=$4
-cell_a=$5
-cell_b=$6
-cell_c=$7
-Field_mag=$8
-FIELD=$9
+N=$4
+Field_mag=$5
 
-Angle=Angles
+#Angle=Angles
 
-for field_line in {1..36}
+#for field_line in {1..36}
+#do
+
+#field=$(sed -n "$field_line"p $Fieldfile) 
+#angle=$(sed -n "$field_line"p $Angle)
+
+for theta in 0 20 40 60 80 100 120 140 160 180 200 220 240 260 280 300 320 340 360
+do
+for phi in 0 20 40 60 80 100 120 140 160 180 200 220 240 260 280 300 320 340 360
 do
 
-field=$(sed -n "$field_line"p $Fieldfile) 
-angle=$(sed -n "$field_line"p $Angle)
+#echo $theta
 
-echo $field
+#echo $phi
 
-Mobility=$(python Mobility.py 108 $Jfile $Locationsfile $cell_a $cell_b $cell_c $Field_mag $field $angle) 
+Mobility=$(python Mobility.py $N $Locationsfile $Jfile $Field_mag $theta $phi)
 
 echo $Mobility
 
-echo $Mobility >> "${Name}"_mobility_vs_angle_"${FIELD}".dat
+echo $Mobility >> "${Name}"_mobility_vs_angle.dat
 done
- 
+done
+
 #rm locations.txt
 
 
