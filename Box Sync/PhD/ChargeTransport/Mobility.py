@@ -119,10 +119,10 @@ unit_cell_vecs=np.zeros((N,N,3))
 rest_distance_matrix=np.zeros((N,N,3))
 
 unit_cell_vecs[0:M,:,:]=distancematrix[0:M,:,:]
-rest_distance_matrix[M+1:N,:,:]=distancematrix[M+1:N,:,:]
+rest_distance_matrix[M:N,:,:]=distancematrix[M:N,:,:]
 
 for i in range(0,M):
-	for j in range(M+1,N):
+	for j in range(M,N):
 		J_match = find_rows(unit_cell_vecs[i,:,:],rest_distance_matrix[j,:,:])
 		if unit_cell_vecs[i,J_match[0][0],:].all()!=0:
 			for match in range(0,len(J_match)):
