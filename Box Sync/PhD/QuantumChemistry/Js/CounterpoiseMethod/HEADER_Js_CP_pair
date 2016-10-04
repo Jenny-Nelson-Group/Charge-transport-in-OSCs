@@ -1,7 +1,4 @@
-%nprocshared=1
-%Mem=8GB
-#p IOp(3/33=1,6/7=3) b3lyp/6-31g* nosymm
-
-Find some Js; yes please.
-
-0 1
+--Link1--
+%chk=dimer.chk
+%mem=100Mb
+#p geom(allcheck) guess(read,only) IOp(3/33=1) b3lyp/6-31g* nosymm
