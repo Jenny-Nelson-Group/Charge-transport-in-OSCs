@@ -25,8 +25,18 @@ def CountPJ():
 
 # Size of basis sets
 	Nbasis=molAB.nbasis
+
+# HOMO index
 	nhomoA=molA.homos
 	nhomoB=molB.homos
+	nhomoAB=molAB.homos
+
+	nlumoA=nhomoA+1
+	nlumoB=nhomoB+1
+
+	print "HOMO A: ", nhomoA
+	print "HOMO B: ", nhomoB
+	print "HOMO AB: ", nhomoAB
 
 # Every basis set should have the same size (the size of the pair) 
 	if molA.nbasis!=molB.nbasis:
@@ -38,24 +48,44 @@ def CountPJ():
 	MOsB=molB.mocoeffs[0]
 	MOsAB=molAB.mocoeffs[0]
 
+
 # Get overlaps
 	SAB=molAB.aooverlaps
+
+	print "Overlaps^2: ", np.dot(SAB,SAB)
+
 
 # Get eigenvalues of pair
 	EvalsAB=molAB.moenergies[0]
 
+	print "Energies: ", EvalsAB
+	print "Gap: ", EvalsAB[nhomoAB+1]-EvalsAB[nhomoAB]
+    
+# Find HOMO and LUMO from energy splitting in dimer
+
+	print "ESID HOMO-HOMO coupling", 0.5*(EvalsAB[nhomoAB]-EvalsAB[nhomoAB-1])
+	print "ESID LUMO-LUMO coupling", 0.5*(EvalsAB[nhomoAB+2]-EvalsAB[nhomoAB+1])
+
 # Calculate the molecular orbitals of A and B in the AB basis set
+
 	MolAB_Pro = (np.dot(MOsAB,SAB)).T
 	PsiA_AB_BS = np.dot(MOsA, MolAB_Pro)
 	PsiB_AB_BS = np.dot(MOsB, MolAB_Pro)
 
+
 # Calculate the matrix of transfer integrals
-	JAB=np.dot(np.dot(np.diagflat(EvalsAB),PsiA_AB_BS),PsiB_AB_BS.T)
+
+	JAB=np.dot(np.dot(PsiB_AB_BS,np.diagflat(EvalsAB)),PsiA_AB_BS.T)
+
+# Symmetric Lowdin transformation for required J
+
+	J_eff_HOMO = (JAB[nhomoA,nhomoB]- 0.5*(JAB[nhomoA,nhomoA]+JAB[nhomoB,nhomoB])*SAB[nhomoA,nhomoB])/(1-SAB[nhomoA,nhomoB]*SAB[nhomoA,nhomoB])
+	J_eff_LUMO = (JAB[nlumoA,nlumoB]- 0.5*(JAB[nlumoA,nlumoA]+JAB[nlumoB,nlumoB])*SAB[nlumoA,nlumoB])/(1-SAB[nlumoA,nlumoB]*SAB[nlumoA,nlumoB])
+
 
 # Print the HOMO-HOMO and LUMO-LUMO coupling
-	print "HOMO-HOMO coupling: ", JAB[nhomoA,nhomoB]
-	print "LUMO-LUMO coupling: ", JAB[nhomoA+1,nhomoB+1]
-
+	print "HOMO-HOMO coupling: ", J_eff_HOMO
+	print "LUMO-LUMO coupling: ", J_eff_LUMO
 
 CountPJ()
 
