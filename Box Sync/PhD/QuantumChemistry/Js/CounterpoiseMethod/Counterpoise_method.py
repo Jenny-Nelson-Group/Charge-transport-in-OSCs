@@ -48,13 +48,6 @@ def CountPJ():
 	MOsB=molB.mocoeffs[0]
 	MOsAB=molAB.mocoeffs[0]
 
-
-# Get overlaps
-	SAB=molAB.aooverlaps
-
-	print "Overlaps^2: ", np.dot(SAB,SAB)
-
-
 # Get eigenvalues of pair
 	EvalsAB=molAB.moenergies[0]
 
@@ -68,19 +61,22 @@ def CountPJ():
 
 # Calculate the molecular orbitals of A and B in the AB basis set
 
-	MolAB_Pro = (np.dot(MOsAB,SAB)).T
+	MolAB_Pro = (np.dot(MOsAB,molAB.aooverlaps)).T
 	PsiA_AB_BS = np.dot(MOsA, MolAB_Pro)
 	PsiB_AB_BS = np.dot(MOsB, MolAB_Pro)
-
 
 # Calculate the matrix of transfer integrals
 
 	JAB=np.dot(np.dot(PsiB_AB_BS,np.diagflat(EvalsAB)),PsiA_AB_BS.T)
+	JAA=np.dot(np.dot(PsiA_AB_BS,np.diagflat(EvalsAB)),PsiA_AB_BS.T)
+	JBB=np.dot(np.dot(PsiB_AB_BS,np.diagflat(EvalsAB)),PsiB_AB_BS.T)
+
+	SAB = np.dot(PsiB_AB_BS,PsiA_AB_BS.T)
 
 # Symmetric Lowdin transformation for required J
 
-	J_eff_HOMO = (JAB[nhomoA,nhomoB]- 0.5*(JAB[nhomoA,nhomoA]+JAB[nhomoB,nhomoB])*SAB[nhomoA,nhomoB])/(1-SAB[nhomoA,nhomoB]*SAB[nhomoA,nhomoB])
-	J_eff_LUMO = (JAB[nlumoA,nlumoB]- 0.5*(JAB[nlumoA,nlumoA]+JAB[nlumoB,nlumoB])*SAB[nlumoA,nlumoB])/(1-SAB[nlumoA,nlumoB]*SAB[nlumoA,nlumoB])
+	J_eff_HOMO = (JAB[nhomoA,nhomoB]- 0.5*(JAA[nhomoA,nhomoA]+JBB[nhomoB,nhomoB])*SAB[nhomoA,nhomoB])/(1.0-SAB[nhomoA,nhomoB]*SAB[nhomoA,nhomoB])
+	J_eff_LUMO = (JAB[nlumoA,nlumoB]- 0.5*(JAA[nlumoA,nlumoA]+JBB[nlumoB,nlumoB])*SAB[nlumoA,nlumoB])/(1.0-SAB[nlumoA,nlumoB]*SAB[nlumoA,nlumoB])
 
 
 # Print the HOMO-HOMO and LUMO-LUMO coupling
