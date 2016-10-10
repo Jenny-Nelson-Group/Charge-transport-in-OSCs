@@ -10,6 +10,8 @@ def ProJ():
     MOLA_proj=sys.argv[1]
     MOLB_proj=sys.argv[2]
     MOLAB_proj=sys.argv[3]
+    Degeneracy_HOMO=int(sys.argv[4])
+    Degeneracy_LUMO=int(sys.argv[5])    # =0 for non-degenerate, 2,3 etc for doubly, triply etc
 
 # Open the log files
     molA_parser=ccopen("%s"%(MOLA_proj))
@@ -21,14 +23,14 @@ def ProJ():
     molB=molB_parser.parse()
     molAB=molAB_parser.parse()
 
-    print ("Parsed...")
+    #print ("Parsed...")
 
 # Size of basis sets
     nbasisA=molA.nbasis
     nbasisB=molB.nbasis
     
-    print "nbasisA: ", nbasisA
-    print "nbasisB: ", nbasisB
+    #print "nbasisA: ", nbasisA
+    #print "nbasisB: ", nbasisB
     
     Nbasis=nbasisA+nbasisB
 
@@ -36,8 +38,8 @@ def ProJ():
     nhomoA=molA.homos
     nhomoB=molB.homos
     
-    print "nhomoA: ", nhomoA
-    print "nhomoB: ", nhomoB
+    #print "nhomoA: ", nhomoA
+    #print "nhomoB: ", nhomoB
     
 # Get molecular orbitals. Need the transpose for our purposes.
     MOsA=(molA.mocoeffs[0]).T
@@ -64,20 +66,44 @@ def ProJ():
 
 # Calculate upper diagonal matrix D, such that S=D.T*D for Lowdin orthogonalisation.       
     D=sp.linalg.cholesky(S)
+
     Dpair=sp.linalg.cholesky(SAB)
 
 # Orthogonalise MOs matrix and MOsAB matrix
     MOsorth=np.dot(D,MOs)
+
+    #print np.shape(MOsorth)
+
     MOspairorth=np.dot(Dpair,MOsAB)
+
+    #print np.shape(MOspairorth)
 
 # Calculate the Fock matrix    
     B=np.dot(MOsorth.T,MOspairorth)
     Evals=np.diagflat(EvalsAB)    
     F=np.dot(np.dot(B,Evals),B.T)
 
+
 # Output the HOMO-HOMO and LUMO-LUMO coupling elements fromt the Fock matrix
-    print "HOMO-HOMO coupling: ", F[nhomoB+nbasisA,nhomoA]
-    print "LUMO-LUMO coupling: ", F[nhomoB+nbasisA+1,nhomoA+1]
+
+    if Degeneracy_HOMO==0:
+        print "HOMO-HOMO coupling: ", F[nhomoB+nbasisA,nhomoA]
+
+    if Degeneracy_LUMO==0:
+        print "LUMO-LUMO coupling: ", F[nhomoB+nbasisA+1,nhomoA+1]
+
+# Degeneracies
+
+    if Degeneracy_HOMO!=0:
+        F_deg_HOMO=F[nhomoB+nbasisA-Degeneracy_HOMO+1:nhomoB+nbasisA+1,nhomoA-Degeneracy_HOMO:nhomoA]
+        print "HOMO-HOMO coupling", (np.sum(np.absolute(F_deg_HOMO**2)))/Degeneracy_HOMO**2
+
+    if Degeneracy_LUMO!=0:
+        F_deg_LUMO=F[nhomoB+nbasisA:nhomoB+nbasisA+Degeneracy_LUMO,nhomoA:nhomoA+Degeneracy_LUMO]
+        print "LUMO-LUMO coupling", (np.sum(np.absolute(F_deg_LUMO**2)))/Degeneracy_LUMO**2
+		
+
+
 
 
 ProJ()
