@@ -85,26 +85,6 @@ def CountPJ():
 	print "HOMO-HOMO coupling: ", J_eff_HOMO
 	print "LUMO-LUMO coupling: ", J_eff_LUMO
 
-	SA=molA.aooverlaps
-	SB=molB.aooverlaps
-
-	DA=sp.linalg.cholesky(SA)
-	DB=sp.linalg.cholesky(SB)
-	DAB=sp.linalg.cholesky(SAB)
-
-	MOsA_orth = np.dot(DA,MOsA.T)
-	MOsB_orth = np.dot(DB,MOsB.T)
-	MOsAB_orth = np.dot(DAB,MOsAB.T)
-
-	MolAB_Pro_orth=(np.dot(MOsAB_orth,SAB)).T
-	PsiA_AB_BS_orth=np.dot(MOsA_orth,MolAB_Pro_orth)
-	PsiB_AB_BS_orth=np.dot(MOsB_orth,MolAB_Pro_orth)
-
-	JAB_lowd=np.dot(np.dot(PsiB_AB_BS_orth,np.diagflat(EvalsAB)),PsiA_AB_BS_orth.T)
-
-	print "HOMO-HOMO coupling with Lowdin", JAB_lowd[nhomoA,nhomoB]
-	print "LUMO-LUMO coupling with Lowdin", JAB_lowd[nlumoA,nlumoB]
-
 CountPJ()
 
 
