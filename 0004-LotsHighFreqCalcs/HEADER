@@ -1,0 +1,7 @@
+%Mem=10Gb
+%nprocshared=12
+#p sp scf=verytight b3lyp/6-31g* Field=FIELD 
+
+Ain't no field like and E-field.
+
+0 1
