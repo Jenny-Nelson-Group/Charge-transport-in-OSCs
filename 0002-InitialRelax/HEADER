@@ -1,0 +1,7 @@
+%Mem=16Gb
+%nprocshared=20
+#p opt scf=verytight b3lyp/6-31g* Field=FIELD 
+
+Ain't no field like an E-field, with a bit of relaxation.
+
+0 1
