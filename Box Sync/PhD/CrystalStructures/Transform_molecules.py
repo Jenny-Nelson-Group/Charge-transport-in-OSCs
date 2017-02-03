@@ -44,7 +44,6 @@ coordfile=np.inner(np.linalg.inv(cell),coordfile).T
 #Add a column of ones for matrix multiplication as in Vesta
 coordfile=np.c_[coordfile,np.ones(n)]
 
-
 # Transform matrices
 
 Transforms = Spacegroup.choose(SG)
@@ -82,20 +81,24 @@ Translations=[ [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
               [[1,0,0,-1],[0,1,0,-1],[0,0,1,-1],[0,0,0,1]]
               ]
 
+in_cell=
 
 for displace_n,displace in enumerate(Translations):
     for transform_n,transform in enumerate(Transforms):
         # Transform coordinates
         trans=np.inner(transform,coordfile).T
-        # Apply PBCs to project back into cell if necessary
-        trans[trans<0.0]+=1.0
-        trans[trans>1.0]-=1.0
         # Translate in one of 6 directions
         trans=np.inner(displace,trans).T
         # Remove column of ones
         trans=trans[:,[0,1,2]]
+		# Find central unit cell
+		for i in range(0,n):
+    		if 0<trans[i,0]<1 and 0<trans[i,1]<1 and 0<trans[i,2]<1:
+        		in_cell=np.append(in_cell,transform_n+displace_n*m)	
+			
         # Scale up to real coordinates
         trans=np.inner(trans,cell)
+	
         # Put labels back to save in xyz format
         trans=np.array(zip(labels,trans[:,0],trans[:,1],trans[:,2]),dtype=[('labels','S8'),('trans[:,0]',float),('trans[:,1]',float),('trans[:,2]',float)])
         # Save
