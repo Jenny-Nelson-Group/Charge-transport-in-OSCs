@@ -6,102 +6,110 @@ import numpy as np
 import sys
 import Spacegroup
 
-data = sys.argv[1]
 
-# Extract raw data from xyz file (i.e. discard atom symbols)
-labels = np.genfromtxt(data,usecols=0,dtype=str)
-coordfile = np.genfromtxt(data)[:,1:]
+def read_in_files():
+	data = sys.argv[1]
 
-# print "Coordinates: ", coordfile
+	# Extract raw data from xyz file (i.e. discard atom symbols)
+	labels = np.genfromtxt(data,usecols=0,dtype=str)
+	coordfile = np.genfromtxt(data)[:,1:]
 
-n=int(sys.argv[2])
+	# print "Coordinates: ", coordfile
+	n=int(sys.argv[2])
 
-#print "Coordinates: ", coordfile
+	# Cell lengths
+	x=float(sys.argv[3])
+	y=float(sys.argv[4])
+	z=float(sys.argv[5])
 
-# Cell lengths
-x=float(sys.argv[3])
-y=float(sys.argv[4])
-z=float(sys.argv[5])
+	# Read in space group: Pbca, Cc, P21c, P21, Pna21, Pbcn, P212121, C2c, P_1, 		Pca21, C2
+	SG = sys.argv[6]
 
-# Read in space group: Pbca, Cc, P21c, P21, Pna21, Pbcn, P212121, C2c, P_1, Pca21, C2
-SG = sys.argv[6]
-
-
-# File name for output files
-file = sys.argv[7]
-
-# Cell matrix
-cell= [  [x,           0.0000000000,         0.0000000000,],
-       [0.0000000000,        y,              0.0000000000,],
-       [0.0000000000,        0.0000000000,         z] ]
+	# File name for output files
+	filename = sys.argv[7]
 
 
-# Transform to fractional coordinates
-coordfile=np.inner(np.linalg.inv(cell),coordfile).T
 
-#print "Fractional coordinates: ", coordfile
+def transform_and_translate():
 
-#Add a column of ones for matrix multiplication as in Vesta
-coordfile=np.c_[coordfile,np.ones(n)]
+	# Cell matrix
+	cell= [  [x,           0.0000000000,         0.0000000000,],
+    	   [0.0000000000,        y,              0.0000000000,],
+    	   [0.0000000000,        0.0000000000,         z] ]
 
-# Transform matrices
 
-Transforms = Spacegroup.choose(SG)
+	# Transform to fractional coordinates
+	coordfile=np.inner(np.linalg.inv(cell),coordfile).T
 
-m=len(Transforms)
+	#print "Fractional coordinates: ", coordfile
 
-# Translation matrices
+	#Add a column of ones for matrix multiplication as in Vesta
+	coordfile=np.c_[coordfile,np.ones(n)]
 
-Translations=[ [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
-              [[1,0,0,1],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
-              [[1,0,0,0],[0,1,0,1],[0,0,1,0],[0,0,0,1]],
-              [[1,0,0,0],[0,1,0,0],[0,0,1,1],[0,0,0,1]],
-              [[1,0,0,-1],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
-              [[1,0,0,0],[0,1,0,-1],[0,0,1,0],[0,0,0,1]],
-              [[1,0,0,0],[0,1,0,0],[0,0,1,-1],[0,0,0,1]],
-              [[1,0,0,1],[0,1,0,1],[0,0,1,0],[0,0,0,1]],
-              [[1,0,0,1],[0,1,0,-1],[0,0,1,0],[0,0,0,1]],
-              [[1,0,0,-1],[0,1,0,1],[0,0,1,0],[0,0,0,1]],
-              [[1,0,0,-1],[0,1,0,-1],[0,0,1,0],[0,0,0,1]],
-              [[1,0,0,1],[0,1,0,0],[0,0,1,1],[0,0,0,1]],
-              [[1,0,0,1],[0,1,0,0],[0,0,1,-1],[0,0,0,1]],
-              [[1,0,0,-1],[0,1,0,0],[0,0,1,1],[0,0,0,1]],
-              [[1,0,0,-1],[0,1,0,0],[0,0,1,-1],[0,0,0,1]],
-              [[1,0,0,0],[0,1,0,1],[0,0,1,1],[0,0,0,1]],
-              [[1,0,0,0],[0,1,0,1],[0,0,1,-1],[0,0,0,1]],
-              [[1,0,0,0],[0,1,0,-1],[0,0,1,1],[0,0,0,1]],
-              [[1,0,0,0],[0,1,0,-1],[0,0,1,-1],[0,0,0,1]],
-              [[1,0,0,1],[0,1,0,-1],[0,0,1,-1],[0,0,0,1]],
-              [[1,0,0,-1],[0,1,0,-1],[0,0,1,1],[0,0,0,1]],
-              [[1,0,0,-1],[0,1,0,1],[0,0,1,-1],[0,0,0,1]],
-              [[1,0,0,-1],[0,1,0,1],[0,0,1,1],[0,0,0,1]],
-              [[1,0,0,1],[0,1,0,-1],[0,0,1,1],[0,0,0,1]],
-              [[1,0,0,1],[0,1,0,1],[0,0,1,-1],[0,0,0,1]],
-              [[1,0,0,1],[0,1,0,1],[0,0,1,1],[0,0,0,1]],
-              [[1,0,0,-1],[0,1,0,-1],[0,0,1,-1],[0,0,0,1]]
-              ]
+	# Transform matrices
 
-in_cell=
+	Transforms = Spacegroup.choose(SG)
 
-for displace_n,displace in enumerate(Translations):
-    for transform_n,transform in enumerate(Transforms):
-        # Transform coordinates
-        trans=np.inner(transform,coordfile).T
-        # Translate in one of 6 directions
-        trans=np.inner(displace,trans).T
-        # Remove column of ones
-        trans=trans[:,[0,1,2]]
-		# Find central unit cell
-		for i in range(0,n):
-    		if 0<trans[i,0]<1 and 0<trans[i,1]<1 and 0<trans[i,2]<1:
-        		in_cell=np.append(in_cell,transform_n+displace_n*m)	
-			
-        # Scale up to real coordinates
-        trans=np.inner(trans,cell)
-	
-        # Put labels back to save in xyz format
-        trans=np.array(zip(labels,trans[:,0],trans[:,1],trans[:,2]),dtype=[('labels','S8'),('trans[:,0]',float),('trans[:,1]',float),('trans[:,2]',float)])
-        # Save
-        np.savetxt("%s_%d.xyz"%(file,transform_n+displace_n*m),trans,delimiter=" ",fmt=["%s"]+["%f"]+["%f"]+["%f"])
+	m=len(Transforms)
+
+	# Translation matrices
+
+	Translations=[ [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
+    	          [[1,0,0,1],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
+    	          [[1,0,0,0],[0,1,0,1],[0,0,1,0],[0,0,0,1]],
+    	          [[1,0,0,0],[0,1,0,0],[0,0,1,1],[0,0,0,1]],
+    	          [[1,0,0,-1],[0,1,0,0],[0,0,1,0],[0,0,0,1]],
+    	          [[1,0,0,0],[0,1,0,-1],[0,0,1,0],[0,0,0,1]],
+    	          [[1,0,0,0],[0,1,0,0],[0,0,1,-1],[0,0,0,1]],
+    	          [[1,0,0,1],[0,1,0,1],[0,0,1,0],[0,0,0,1]],
+    	          [[1,0,0,1],[0,1,0,-1],[0,0,1,0],[0,0,0,1]],
+    	          [[1,0,0,-1],[0,1,0,1],[0,0,1,0],[0,0,0,1]],
+    	          [[1,0,0,-1],[0,1,0,-1],[0,0,1,0],[0,0,0,1]],
+    	          [[1,0,0,1],[0,1,0,0],[0,0,1,1],[0,0,0,1]],
+    	          [[1,0,0,1],[0,1,0,0],[0,0,1,-1],[0,0,0,1]],
+    	          [[1,0,0,-1],[0,1,0,0],[0,0,1,1],[0,0,0,1]],
+    	          [[1,0,0,-1],[0,1,0,0],[0,0,1,-1],[0,0,0,1]],
+    	          [[1,0,0,0],[0,1,0,1],[0,0,1,1],[0,0,0,1]],
+    	          [[1,0,0,0],[0,1,0,1],[0,0,1,-1],[0,0,0,1]],
+    	          [[1,0,0,0],[0,1,0,-1],[0,0,1,1],[0,0,0,1]],
+    	          [[1,0,0,0],[0,1,0,-1],[0,0,1,-1],[0,0,0,1]],
+    	          [[1,0,0,1],[0,1,0,-1],[0,0,1,-1],[0,0,0,1]],
+    	          [[1,0,0,-1],[0,1,0,-1],[0,0,1,1],[0,0,0,1]],
+    	          [[1,0,0,-1],[0,1,0,1],[0,0,1,-1],[0,0,0,1]],
+    	          [[1,0,0,-1],[0,1,0,1],[0,0,1,1],[0,0,0,1]],
+    	          [[1,0,0,1],[0,1,0,-1],[0,0,1,1],[0,0,0,1]],
+    	          [[1,0,0,1],[0,1,0,1],[0,0,1,-1],[0,0,0,1]],
+    	          [[1,0,0,1],[0,1,0,1],[0,0,1,1],[0,0,0,1]],
+    	          [[1,0,0,-1],[0,1,0,-1],[0,0,1,-1],[0,0,0,1]]
+    	          ]
+
+	for displace_n,displace in enumerate(Translations):
+	    for transform_n,transform in enumerate(Transforms):
+	        # Transform coordinates
+	        trans=np.inner(transform,coordfile).T
+	        # Translate in one of 6 directions
+	        trans=np.inner(displace,trans).T
+	        # Remove column of ones
+	        trans=trans[:,[0,1,2]]
+	        # Scale up to real coordinates
+	        trans=np.inner(trans,cell)
+
+	return trans
+
+
+
+
+
+
+
+
+def save_files(file_to_save,labels,filename):
+		
+	# Put labels back to save in xyz format
+	trans=np.array(zip(labels,file_to_save[:,0],file_to_save[:,1],file_to_save[:,2]),dtype=		[('labels','S8'),('trans[:,0]',float),('trans[:,1]',float),('trans[:,2]',float)])
+	# Save
+	np.savetxt("%s_%d.xyz"%(filename,transform_n+displace_n*m),trans,delimiter=" 	",fmt=["%s"]+["%f"]+["%f"]+["%f"])
+
+
 
 
