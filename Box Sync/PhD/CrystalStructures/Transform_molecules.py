@@ -114,6 +114,9 @@ def transform_and_translate(coordfile,cell):
 def check_in_cell(coordfile):
 	coordfile_fractional=np.inner(np.linalg.inv(CELL),coordfile).T
 	atoms=[]
+    
+    # Check how many atoms of each molecule are in the unit cell
+    
 	for i in range(0,N):
 		if 0<coordfile_fractional[i,0]<1 and 0<coordfile_fractional[i,1]<1 and 0<coordfile_fractional[i,2]<1:
 			atoms=np.append(atoms,i)
@@ -124,17 +127,24 @@ def check_in_cell(coordfile):
 
 def unit_cell(all_molecules):
 	in_cell=[0,0]
+    
+    # Check if any atoms in molecule are in the unit cell
+    
 	for i in range(0,len(all_molecules)):
 		check=check_in_cell(all_molecules[i,:,:])
 		if check>0:
 			in_cell=np.vstack((in_cell,[i,check]))
 	in_cell=in_cell[1:]
 
+    # Sort molecules by amount in unit cell
+
 	sorted_idx=np.argsort(in_cell[:,1])
 	in_cell_sorted=in_cell[sorted_idx][::-1]
 
 	unitcell_idx=[0,0]
-        
+
+    # Define one molecule in each orientation as a member of the unit cell
+
 	for i in range(len(in_cell_sorted)):
 		for j in range(1,M):
 			if in_cell_sorted[i,0]%M==j and (j in unitcell_idx) == False:
@@ -144,7 +154,8 @@ def unit_cell(all_molecules):
 	print unitcell_idx
 
 	unitcell=all_molecules[unitcell_idx[:,1],:,:]
-	print unitcell
+
+    # Outputs the molecule coordinates of all molecules in the unit cell
 
 	return unitcell
 
@@ -152,6 +163,8 @@ def unit_cell(all_molecules):
 
 def make_supercell(UNIT_CELL):
 
+    # Make a supercell starting with molecules from unit cell
+    
     all_molecules = np.zeros((1,N,3))
 
     for displace_n,displace in enumerate(translations()):
