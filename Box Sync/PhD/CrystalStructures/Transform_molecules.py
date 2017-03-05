@@ -20,20 +20,33 @@ COORDFILE = np.genfromtxt(data)[:,1:]
 N=len(COORDFILE)
 
 # Cell lengths
-x=float(sys.argv[2])
-y=float(sys.argv[3])
-z=float(sys.argv[4])
+a=float(sys.argv[2])
+b=float(sys.argv[3])
+c=float(sys.argv[4])
+
+# Angles
+alpha=np.radians(float(sys.argv[5]))
+beta=np.radians(float(sys.argv[6]))
+gamma=np.radians(float(sys.argv[7]))
+
+# Volume of parallelepiped defining unit cell
+omega=a*b*c*np.sqrt(1-np.cos(alpha)**2-np.cos(beta)**2-np.cos(gamma)**2+2*np.cos(alpha)*np.cos(beta)*np.cos(gamma))
  
 # Read in space group: Pbca, Cc, P21c, P21, Pna21, Pbcn, P212121, C2c, P_1,Pca21, C2
-SG = sys.argv[5]
+SG = sys.argv[8]
 
 # File name for output files
-filename = sys.argv[6]
+filename = sys.argv[9]
 
-# Cell matrix
-CELL= [  [x,           0.0000000000,         0.0000000000,],
-[0.0000000000,        y,              0.0000000000,],
-[0.0000000000,        0.0000000000,         z] ]
+# Conversions between fractional and real coordinates (inc for non orthogonal cells)
+
+xyz_to_frac = [[1/a,-np.cos(gamma)/(a*np.sin(gamma)),(b*c*np.cos(alpha)*np.cos(gamma)-np.cos(beta))/(omega*np.sin(gamma))],
+[0,1/(b*np.sin(gamma)),(a*c*np.cos(beta)*np.cos(gamma)-np.cos(alpha))/(omega*np.sin(gamma))],
+[0,0,a*b*np.sin(gamma)/omega] ]
+
+frac_to_xyz = [  [a,b*np.cos(gamma),c*np.cos(beta),],
+               [0,b*np.sin(gamma),(c*np.cos(alpha)-np.cos(beta)*np.cos(gamma))/np.sin(gamma)],
+               [0,0,omega/(a*b*np.sin(gamma))] ]
 
 
 # -------------------------------------------------------------------------------------- #
@@ -75,10 +88,10 @@ def translations():
 
 # -------------------------------------------------------------------------------------- #
 
-def transform_and_translate(coordfile,cell):
+def transform_and_translate(coordfile):
 
 	# Transform to fractional coordinates
-	coordfile=np.inner(np.linalg.inv(cell),coordfile).T
+	coordfile=np.inner(xyz_to_frac,coordfile).T
 
 	#print "Fractional coordinates: ", coordfile
 
@@ -104,7 +117,7 @@ def transform_and_translate(coordfile,cell):
 	        # Remove column of ones
 			trans=trans[:,[0,1,2]]
 	        # Scale up to real coordinates
-			trans=np.inner(trans,cell)
+			trans=np.inner(frac_to_xyz,trans).T
 			all_transformations=np.vstack((all_transformations,trans[None,...]))
     
 	return all_transformations[1:],m
@@ -112,7 +125,7 @@ def transform_and_translate(coordfile,cell):
 # -------------------------------------------------------------------------------------- #
 
 def check_in_cell(coordfile):
-	coordfile_fractional=np.inner(np.linalg.inv(CELL),coordfile).T
+	coordfile_fractional=np.inner(xyz_to_frac,coordfile).T
 	atoms=[]
     
     # Check how many atoms of each molecule are in the unit cell
@@ -169,14 +182,14 @@ def make_supercell(UNIT_CELL):
 
     for displace_n,displace in enumerate(translations()):
     	for i in range(0,M):
-            trans=np.inner(np.linalg.inv(CELL),UNIT_CELL[i,:,:]).T
+            trans=np.inner(xyz_to_frac,UNIT_CELL[i,:,:]).T
             trans=np.c_[trans,np.ones(N)]
             trans=np.inner(displace,trans).T
             trans=trans[:,[0,1,2]]
-            trans=np.inner(trans,CELL)
+            trans=np.inner(frac_to_xyz,trans).T
             all_molecules=np.vstack((all_molecules,trans[None,...]))
 
-    return all_molecules
+    return all_molecules[1:]
 
 # -------------------------------------------------------------------------------------- #
 
@@ -190,7 +203,7 @@ def save_files(file_to_save,labels,FILENAME,i):
 # -------------------------------------------------------------------------------------- #
 
 
-all_trans,M = transform_and_translate(COORDFILE,CELL)
+all_trans,M = transform_and_translate(COORDFILE)
 unitcell=unit_cell(all_trans)
 all_mols=make_supercell(unitcell)
 
