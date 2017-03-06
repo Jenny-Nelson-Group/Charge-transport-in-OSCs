@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 # Transform molcules to equivalent positions and then translate, then find molecules in the unit cell to make xyz files of each in supercell for calculation of J
@@ -208,7 +209,4 @@ unitcell=unit_cell(all_trans)
 all_mols=make_supercell(unitcell)
 
 for i in range(0,27*M):
-    save_files(all_mols[i,:,:],LABELS,filename,i)
-
-
-
+save_files(all_mols[i,:,:],LABELS,filename,i)
