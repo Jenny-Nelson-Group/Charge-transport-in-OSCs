@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 # Transform molcules to equivalent positions and then translate, then find molecules in the unit cell to make xyz files of each in supercell for calculation of J
@@ -30,7 +31,7 @@ beta=np.radians(float(sys.argv[6]))
 gamma=np.radians(float(sys.argv[7]))
 
 # Volume of parallelepiped defining unit cell
-omega=a*b*c*np.sqrt(1-np.cos(alpha)**2-np.cos(beta)**2-np.cos(gamma)**2+2*np.cos(alpha)*np.cos(beta)*np.cos(gamma))
+omega=a*b*c*np.sqrt(1-(np.cos(alpha))**2-(np.cos(beta))**2-(np.cos(gamma))**2+2*np.cos(alpha)*np.cos(beta)*np.cos(gamma))
  
 # Read in space group: Pbca, Cc, P21c, P21, Pna21, Pbcn, P212121, C2c, P_1,Pca21, C2
 SG = sys.argv[8]
@@ -40,13 +41,13 @@ filename = sys.argv[9]
 
 # Conversions between fractional and real coordinates (inc for non orthogonal cells)
 
-xyz_to_frac = [[1/a,-np.cos(gamma)/(a*np.sin(gamma)),(b*c*np.cos(alpha)*np.cos(gamma)-np.cos(beta))/(omega*np.sin(gamma))],
-[0,1/(b*np.sin(gamma)),(a*c*np.cos(beta)*np.cos(gamma)-np.cos(alpha))/(omega*np.sin(gamma))],
-[0,0,a*b*np.sin(gamma)/omega] ]
+xyz_to_frac = [[1./a,-np.cos(gamma)/(a*np.sin(gamma)),b*c*(np.cos(alpha)*np.cos(gamma)-np.cos(beta))/(omega*np.sin(gamma))],
+[0.,1./(b*np.sin(gamma)),a*c*(np.cos(beta)*np.cos(gamma)-np.cos(alpha))/(omega*np.sin(gamma))],
+[0.,0.,a*b*np.sin(gamma)/omega] ]
 
-frac_to_xyz = [  [a,b*np.cos(gamma),c*np.cos(beta),],
-               [0,b*np.sin(gamma),(c*np.cos(alpha)-np.cos(beta)*np.cos(gamma))/np.sin(gamma)],
-               [0,0,omega/(a*b*np.sin(gamma))] ]
+frac_to_xyz = [  [a,b*np.cos(gamma),c*np.cos(beta)],
+               [0.,b*np.sin(gamma),c*(np.cos(alpha)-np.cos(beta)*np.cos(gamma))/np.sin(gamma)],
+               [0.,0.,omega/(a*b*np.sin(gamma))] ]
 
 
 # -------------------------------------------------------------------------------------- #
@@ -208,7 +209,4 @@ unitcell=unit_cell(all_trans)
 all_mols=make_supercell(unitcell)
 
 for i in range(0,27*M):
-    save_files(all_mols[i,:,:],LABELS,filename,i)
-
-
-
+save_files(all_mols[i,:,:],LABELS,filename,i)
