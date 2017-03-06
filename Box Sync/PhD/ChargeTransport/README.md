@@ -8,6 +8,6 @@ The following inputs are required:
 
 2. Jfile of electronic couplings between molecules, given in rows of $molecule1 $molecule2 $J
 
-3. Magnitude of electric field applied, in A/cm
+3. Magnitude of electric field applied, in V/cm
 
 4. Filename for saving plots
