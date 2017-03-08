@@ -1,19 +1,13 @@
 # Calculate Mobility
 
-The script Get_mobility.sh calculates the charge carrier mobility in a crystalline system where the Marcus equation for rates applies (J<<lambda) with the python script Mobility.py
+The python code Mobility.py calculates the charge carrier mobility in a crystalline system where the Marcus equation for rates applies (J<<lambda). The code finds the angular dependent mobility in the ab, bc and ac planes, and plots on a polar plot.
 
 The following inputs are required:
 
-1. Name for output file
+1. Locationsfile of xyz coordinate of centres of molecules in crystal
 
-2. Locationsfile of xyz coordinates centres of molecules in crystal
+2. Jfile of electronic couplings between molecules, given in rows of $molecule1 $molecule2 $J
 
-3. Jfile of electronic couplings between molecules, given in rows of $molecule1 $molecule2 $J
+3. Magnitude of electric field applied, in V/cm
 
-4. FieldFile of field strengths in 36 equally spaced directions (Given in Field_ab_rads.txt Field_bc_rads.txt Field_ac_rad.txt for the ab, bc and ac planes)
-
-5, 6, 7. cell_a, cell_b, cell_c dimensions of unit cell, in Angstroms
-
-8. Magnitude of electric field applied, in A/cm
-
-9. Field name for saving
+4. Filename for saving plots

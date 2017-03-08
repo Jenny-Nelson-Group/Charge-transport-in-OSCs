@@ -25,9 +25,7 @@ def null(X,eps=1e-12):
     Solution=0
     u, s, vh = scipy.linalg.svd(X)     # Single value decomposition
     null_mask = (np.absolute(s) <= eps)
-
     null_space = scipy.compress(null_mask, vh, axis=0)  # Find corresponding vectors
-
     n,m=np.shape(null_space)
     for i in range(0,n):           # Choose only solutions that can be probabilities
         positive=np.greater_equal(null_space[i,:],np.zeros(m))     
@@ -82,7 +80,9 @@ def fill_Js(J):
 
 # --------------------------------- Calculate matrix of rates ------------------------------------------ #
 
-def Marcus_rates(J_all,field):
+def Marcus_rates(J,field):
+    
+    A=np.zeros((N,N))
 
     for i in range(0,N):
         for j in range(0,N):
@@ -92,7 +92,6 @@ def Marcus_rates(J_all,field):
                 Field_d=np.dot(field,d)
                 #print "field= ", field
                 A[i,j]=((J[i,j]*J[i,j]))*((np.pi/(Lambda*kb*T))**0.5)*np.exp(-(((deltaE-Field_d)+Lambda)**2)/(4*Lambda*kb*T))
-                #print A[i,j]
     return A
 
 
@@ -105,10 +104,9 @@ def Master_eq(A):
     for i in range(0,N):
         A[i,i]=-np.sum(A[:,i])
 
-
     P_all=null(A)
 
-    print "P: ", P_all
+    #print "P: ", P_all
 
     return P_all
 
@@ -127,11 +125,13 @@ def Mob(A,P_all,field_unit):
 				V+=distancematrix[i,j,:]*A[i,j]*P_all[i]
 
 
-	V_F=np.dot(V,(field_unit))       # V in direction of field
+	V_F=np.dot(V,field_unit)       # V in direction of field
 
 	mu = (V_F/F_mag)/hbar                # Mobility in cm^2/Vs
     
 	print "Mobility= ", mu, " cm^2/Vs"
+
+	return mu
 
 
 # ------------------------------------ Mobility from Einstein relation --------------------------------- #
@@ -165,7 +165,7 @@ def Mob_einstein(A,P_all,theta,plane):
 # -------------------------------------- Plot mobility vs angle  --------------------------------------- #
 
 
-def Plot_mobility(Angles,Mobilities)
+def Plot_mobility(Angles,Mobilities,plane):
 
     print "average: ", np.mean(np.absolute(Mobilities))
 
@@ -184,7 +184,7 @@ def Plot_mobility(Angles,Mobilities)
     ax.legend(loc='upper left', bbox_to_anchor=(-0.2,1.1))
 
     pl.show()
-    fig.savefig("%s_mobility.pdf"%(filename))
+    fig.savefig("%s_mobility_%s.pdf"%(filename,plane))
 
 
 #------------------------------  Read in data/ set constants and variables ----------------------------- #
@@ -195,6 +195,7 @@ def Plot_mobility(Angles,Mobilities)
 coordfile=np.loadtxt(sys.argv[1]) # read in coordinate file (in Angstroms)
 Jif=np.loadtxt(sys.argv[2])		  # Read in J file (with columns $i $j J)
 F_mag=float(sys.argv[3])          # Magnitude of field vector (in V/cm). Set to zero for no field.
+filename=sys.argv[4]
 N=len(coordfile)                  # Number of molecules
 
 # Define constants
@@ -216,32 +217,60 @@ Size=len(Jif[:,2])
 
 orderedJs=np.argsort(Jif[:,2])
 
-print "Top Js: ", Jif[orderedJs[Size-10:Size],2], "at", Jif[orderedJs[Size-10:Size],0], Jif[orderedJs[Size-10:Size],1]
+#print "Top Js: ", Jif[orderedJs[Size-10:Size],2], "at", Jif[orderedJs[Size-10:Size],0], Jif[orderedJs[Size-10:Size],1]
 
-J=np.zeros((N,N))              # Set up Js in matrix
+Js=np.zeros((N,N))              # Set up Js in matrix
 
 for i in range(0,Size):
-    J[Jif[i,0],Jif[i,1]]=Jif[i,2]
+    Js[int(Jif[i,0]),int(Jif[i,1])]=Jif[i,2]
 
 coordfile=coordfile*10**-8     # Convert from Angstroms to cm
 
 distancematrix=coordfile[:,None,...]-coordfile[None,...]
 
+J_all=fill_Js(Js)
 
-J_all=fill_Js(J)
+Mob_ab=[]
+Mob_bc=[]
+Mob_ac=[]
+angles=[]
+
 
 for theta in np.linspace(0,2*np.pi,36):
-    
     FIELDab=[F_mag*np.cos(theta),F_mag*np.sin(theta),0]
     FIELDbc=[0,F_mag*np.cos(theta),F_mag*np.sin(theta)]
     FIELDac=[F_mag*np.cos(theta),0,F_mag*np.sin(theta)]
     
     FIELDab_unit=[np.cos(theta),np.sin(theta),0]
-
+    FIELDbc_unit=[0,np.cos(theta),np.sin(theta)]
+    FIELDac_unit=[np.cos(theta),0,np.sin(theta)]
+    
     Ratesab=Marcus_rates(J_all,FIELDab)
+    Ratesbc=Marcus_rates(J_all,FIELDbc)
+    Ratesac=Marcus_rates(J_all,FIELDac)
+    
     Pab=Master_eq(Ratesab)
+    Pbc=Master_eq(Ratesbc)
+    Pac=Master_eq(Ratesac)
+    
     mobilityab=Mob(Ratesab,Pab,FIELDab_unit)
-    mobility_einab=Mob_einstein(Ratesab,Pab,theta,'ab')
+    mobilitybc=Mob(Ratesbc,Pbc,FIELDbc_unit)
+    mobilityac=Mob(Ratesac,Pac,FIELDac_unit)
+
+    Mob_ab=np.append(Mob_ab,mobilityab)
+    Mob_bc=np.append(Mob_bc,mobilitybc)
+    Mob_ac=np.append(Mob_ac,mobilityac)
+
+    angles=np.append(angles,theta)
+
+
+Plot_mobility(angles,Mob_ab,'ab')
+Plot_mobility(angles,Mob_bc,'bc')
+Plot_mobility(angles,Mob_ac,'ac')
+
+
+
+
 
 
 
