@@ -21,7 +21,7 @@ from sympy import Matrix
 
 # ----------------------  Define null space function for solving AP=0 --------------------------------- #
 
-def null(X,eps=1e-12):
+def null(X,eps=1e-8):
     Solution=0
     u, s, vh = scipy.linalg.svd(X)     # Single value decomposition
     null_mask = (np.absolute(s) <= eps)
@@ -40,7 +40,7 @@ def null(X,eps=1e-12):
 
 def find_rows(a,b):
     
-    row_match = np.array(np.all((np.isclose(a[:,None,:],b[None,:,:],rtol=1e-3,atol=1e-10)),axis=-1).nonzero()).T.tolist()
+    row_match = np.array(np.all((np.isclose(a[:,None,:],b[None,:,:],rtol=1e-3,atol=1e-8)),axis=-1).nonzero()).T.tolist()
 
 
     return row_match 
@@ -75,6 +75,8 @@ def fill_Js(J):
                         J[j,J_match[match][1]]=J[i,J_match[match][0]]
                         J[J_match[match][1],j]=J[J_match[match][0],i]
 
+    print len(J[np.nonzero(J)])
+
     return J
 
 
@@ -92,6 +94,9 @@ def Marcus_rates(J,field):
                 Field_d=np.dot(field,d)
                 #print "field= ", field
                 A[i,j]=((J[i,j]*J[i,j]))*((np.pi/(Lambda*kb*T))**0.5)*np.exp(-(((deltaE-Field_d)+Lambda)**2)/(4*Lambda*kb*T))
+
+    #print len(A[np.nonzero(A)])
+    
     return A
 
 
@@ -106,7 +111,7 @@ def Master_eq(A):
 
     P_all=null(A)
 
-    #print "P: ", P_all
+#print "P: ", P_all
 
     return P_all
 
@@ -165,7 +170,7 @@ def Mob_einstein(A,P_all,theta,plane):
 # -------------------------------------- Plot mobility vs angle  --------------------------------------- #
 
 
-def Plot_mobility(Angles,Mobilities,plane):
+def Plot_mobility(Angles,Mobilities,plane,Max_mob):
 
     print "average: ", np.mean(np.absolute(Mobilities))
 
@@ -178,13 +183,11 @@ def Plot_mobility(Angles,Mobilities,plane):
     ax=pl.subplot(111, polar=True)
     ax.plot(Angles,Mobilities,'o',label='Mobility (cm$^2$V$^{-1}$s$^{-1}$)')
     ax.grid(True)
-    #ax.set_rmax(0.00525)
-    #ax.set_ylim(-2700,2700)
-    #ax.set_yticks(np.arange(-2700,2700,1000))
+    ax.set_rmax(Max_mob)
     ax.legend(loc='upper left', bbox_to_anchor=(-0.2,1.1))
 
-    pl.show()
-    fig.savefig("%s_mobility_%s.pdf"%(filename,plane))
+#    pl.show()
+    fig.savefig("%s_%s_mobility_%s.png"%(filename,carrier,plane))
 
 
 #------------------------------  Read in data/ set constants and variables ----------------------------- #
@@ -194,13 +197,13 @@ def Plot_mobility(Angles,Mobilities,plane):
 
 coordfile=np.loadtxt(sys.argv[1]) # read in coordinate file (in Angstroms)
 Jif=np.loadtxt(sys.argv[2])		  # Read in J file (with columns $i $j J)
-F_mag=float(sys.argv[3])          # Magnitude of field vector (in V/cm). Set to zero for no field.
-filename=sys.argv[4]
+carrier=sys.argv[3]
+F_mag=float(sys.argv[4])          # Magnitude of field vector (in V/cm). Set to zero for no field.
+filename=sys.argv[5]
 N=len(coordfile)                  # Number of molecules
 
 # Define constants
 
-A=np.zeros((N,N))              # Initialise rate matrix
 Lambda_inner=0.1               # Define inner and outer reorganisation energies
 Lambda_outer=0.2
 hbar=6.582*10**-16             # in eV.s
@@ -209,24 +212,35 @@ kb=8.617*10**-5				   # in eV/K
 T=300                          # in K
 M=N/27      				   # M = number of molecules in unit cell (for 3x3x3 supercell)
 
-print M
+#print M
 
 Lambda=Lambda_inner+Lambda_outer  # Calculate total lambda
 
+if carrier=='hole':
+    t=2
+
+if carrier=='electron':
+    t=3
+
 Size=len(Jif[:,2])
 
-orderedJs=np.argsort(Jif[:,2])
+orderedJs=np.argsort(Jif[:,t])
 
 #print "Top Js: ", Jif[orderedJs[Size-10:Size],2], "at", Jif[orderedJs[Size-10:Size],0], Jif[orderedJs[Size-10:Size],1]
+
+print "Max J: ", np.max(Jif[:,t])
 
 Js=np.zeros((N,N))              # Set up Js in matrix
 
 for i in range(0,Size):
-    Js[int(Jif[i,0]),int(Jif[i,1])]=Jif[i,2]
+    Js[int(Jif[i,0]),int(Jif[i,1])]=Jif[i,t]
+    Js[int(Jif[i,1]),int(Jif[i,0])]=Jif[i,t]
 
 coordfile=coordfile*10**-8     # Convert from Angstroms to cm
 
 distancematrix=coordfile[:,None,...]-coordfile[None,...]
+
+#print distancematrix
 
 J_all=fill_Js(Js)
 
@@ -264,19 +278,12 @@ for theta in np.linspace(0,2*np.pi,36):
     angles=np.append(angles,theta)
 
 
-Plot_mobility(angles,Mob_ab,'ab')
-Plot_mobility(angles,Mob_bc,'bc')
-Plot_mobility(angles,Mob_ac,'ac')
+Max=np.max([Mob_ab,Mob_bc,Mob_ac])
 
+print "Max mobility: ", Max
 
-
-
-
-
-
-
-
-
-
+Plot_mobility(angles,Mob_ab,'ab',Max)
+Plot_mobility(angles,Mob_bc,'bc',Max)
+Plot_mobility(angles,Mob_ac,'ac',Max)
 
 
