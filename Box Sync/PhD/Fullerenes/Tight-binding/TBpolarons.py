@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as pl
 import random
 from scipy.sparse.linalg import eigsh
+import sys
 
 
 def Setup_Ham(distance_matrix,sigma,lumo):
@@ -26,7 +27,7 @@ def Setup_Ham(distance_matrix,sigma,lumo):
 def SCpolarongenerator(Ham,Ham_p,site,alpha):
     "Generate a 'polaron' by allowing the site energies to be self-consistently perturbed in proportion to the charge density on the site, until convergence of lowest energy state"
 
-    SCFSTEPS = 100
+    SCFSTEPS = 2000
     init_diagonal = np.diagonal(Ham)
     
     np.fill_diagonal(Ham_p,init_diagonal)
@@ -37,7 +38,7 @@ def SCpolarongenerator(Ham,Ham_p,site,alpha):
 
 
     for i in range(SCFSTEPS): # Number of SCF steps
-        print i
+        #print i
         polaron=Evecs[:,0]*Evecs[:,0] # Find lowest energy state charge density
         np.fill_diagonal(Ham_p,init_diagonal-alpha*polaron) # Deepen site energies in proportion to density
         pvals,pvecs=eigsh(Ham_p,1,which='LM',tol=1E-4)  # Resolve Hamiltonian
@@ -46,9 +47,9 @@ def SCpolarongenerator(Ham,Ham_p,site,alpha):
         Evals=pvals
         Evecs=pvecs
 
-    np.fill_diagonal(Ham_p,init_diagonal)
+#print i
 
-    return Ham_p,pvals,pvecs
+    return Ham_p
 
 
 
@@ -99,6 +100,7 @@ def DOS(evals,nbins):
 coordfile=sys.argv[1]
 locations=np.loadtxt(coordfile)
 N=len(locations)
+cell=[float(sys.argv[2]),float(sys.argv[3]),float(sys.argv[4])]
 
 locations=locations/cell
 
@@ -106,7 +108,7 @@ distancematrix=locations[:,None,...]-locations[None,...]
 
 PBCS=False
 if (PBCS==True):
-    distancematrix[distancematrix<0.5]+=1.0 #minimum image convention
+    distancematrix[distancematrix<-0.5]+=1.0 #minimum image convention
     distancematrix[distancematrix>0.5]-=1.0 #minimum image convention
 
 distancematrix*=cell # scale back to real coordinates
@@ -115,18 +117,36 @@ locations*=cell # scale from fractional coordinates to real distances
 
 # Define parameters
 
-ALPHA=0.2       # Energy of polaron formation
+ALPHA=0.006       # Energy of polaron formation
 SIGMA=0.0       # Energetic disorder
 LUMO=-3.7
-
-
 
 # Main
 
 H = Setup_Ham(distancematrix,SIGMA,LUMO)
-
 Hp=H+0.0
 
+EVALS=[]
+IPRs=[]
+
 for SITE in range(0,N):
-    Ham_p,pvals,pvecs = SCpolarongenerator(H,Hp,SITE,ALPHA)
+    Ham_p = SCpolarongenerator(H,Hp,SITE,ALPHA)
+    pvals,pvecs = Solve_Ham(Ham_p)
+    EVALS=np.append(EVALS,pvals)
+    ipr=IPR(pvecs,0)
+    print SITE,ipr
+    IPRs=np.append(IPRs,ipr)
+
+OCCS=Get_occs(pvecs,0)
+
+print IPRs
+
+print "Average IPR: ", np.mean(IPRs)
+
+np.savetxt("Evals_%s_%s_%s.dat"%(coordfile,ALPHA,SIGMA),EVALS)
+np.savetxt("Evecs_%s_%s_%s.dat"%(coordfile,ALPHA,SIGMA),OCCS)
+np.savetxt("IPRs_%s_%s_%s.dat"%(coordfile,ALPHA,SIGMA),IPRs)
+
+
+
 
