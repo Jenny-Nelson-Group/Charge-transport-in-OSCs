@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-# Calculate the mobility given a crystal structure and the electronic couplings (Js) from the central unit cell to all others in a 3x3x3 supercell. The J file should be in the format $i $j J, where $i and $j are the indices for each molecule, and this code is set up the take advantage of the symmetry in a crystal and duplicate the Js between additional unit cells. The code Transform_molecules.py and can be used to make up the unit cells, given symmetry operations for the crystal structure.
+""" Calculate the mobility given a crystal structure and the electronic couplings (Js) from the central unit cell to all others in a 3x3x3 supercell. The J file should be in the format $i $j J, where $i and $j are the indices for each molecule, and this code is set up the take advantage of the symmetry in a crystal and duplicate the Js between additional unit cells. The code Transform_molecules.py and can be used to make up the unit cells, given symmetry operations for the crystal structure.
 
-# The code works by using the populated J matrix to find the corresponding rates in the prescence of an electric field (although field strength can be set to zero and the mobility calculated via the Einstein relation). 
+ The code works by using the populated J matrix to find the corresponding rates in the prescence of an electric field (although field strength can be set to zero and the mobility calculated via the Einstein relation).
 
-# A master equation for rates is then set up and solved: AP=0, where A is the rate matrix containing the sum of all rates away from a molecule on the diagonal and the rate to each other molecule on the off diagonals. This is used to find the velocity, which can then be used to find the mobility via the field.
+ A master equation for rates is then set up and solved: AP=0, where A is the rate matrix containing the sum of all rates away from a molecule on the diagonal and the rate to each other molecule on the off diagonals. This is used to find the velocity, which can then be used to find the mobility via the field.
 
-# The diffusion coefficient is calculated with a model based on a random walk, which is converted to a mobility with the Einstein relation.
-
+ The diffusion coefficient is calculated with a model based on a random walk, which is converted to a mobility with the Einstein relation. """
 
 
 import numpy as np
@@ -19,9 +18,15 @@ import sys
 from sympy import Matrix
 
 
-# ----------------------  Define null space function for solving AP=0 --------------------------------- #
+LAMBDA=0.3                     # eV
+HBAR=6.582*10**-16             # eV.s
+e=1                            # Charge on electron in eV/V
+KB=8.617*10**-5                # in eV/K
+T=300                          # in K
+
 
 def null(X,eps=1e-8):
+    """ Define null space function for solving AP=0 """
     Solution=0
     u, s, vh = scipy.linalg.svd(X)     # Single value decomposition
     null_mask = (np.absolute(s) <= eps)
@@ -36,21 +41,17 @@ def null(X,eps=1e-8):
     return scipy.transpose(Solution)
 
 
-# -------------------------- Find matching rows (for populating full J matrix ------------------------- #
-
 def find_rows(a,b):
+    """ Find matching rows for populating full J matrix using crystal symmetry """
     
-    row_match = np.array(np.all((np.isclose(a[:,None,:],b[None,:,:],rtol=1e-3,atol=1e-8)),axis=-1).nonzero()).T.tolist()
-
-
+    row_match = np.array(np.all((np.isclose(a[:,None,:],b[None,:,:],rtol=1e-3,atol=1e-8)),
+                                axis=-1).nonzero()).T.tolist()
+                                
     return row_match 
 
 
-#----------------------------------  Find sites in 1st unit cell  ------------------------------------- #
-
 def fill_Js(J):
-    
-    # Find sites in 1st unit cell (by finding rows of matrix containing more than a critical value of non-zeros)
+    """ Find sites in 1st unit cell (by finding rows of matrix containing more than a critical value of non-zeros) """
 
     unit_cell_sites=[]
 
@@ -80,9 +81,8 @@ def fill_Js(J):
     return J
 
 
-# --------------------------------- Calculate matrix of rates ------------------------------------------ #
-
 def Marcus_rates(J,field):
+    """ Calulate matrix of rates with Marcus theory """
     
     A=np.zeros((N,N))
 
@@ -92,35 +92,23 @@ def Marcus_rates(J,field):
                 deltaE=0
                 d=distancematrix[i,j,:]
                 Field_d=np.dot(field,d)
-                #print "field= ", field
-                A[i,j]=((J[i,j]*J[i,j]))*((np.pi/(Lambda*kb*T))**0.5)*np.exp(-(((deltaE-Field_d)+Lambda)**2)/(4*Lambda*kb*T))
-
-    #print len(A[np.nonzero(A)])
-    
+                A[i,j]=((J[i,j]*J[i,j]))*((np.pi/(LAMBDA*KB*T))**0.5)*np.exp(-(((deltaE-Field_d)+LAMBDA)**2)/(4*LAMBDA*KB*T))
     return A
 
 
-
-# --------------------------------- Solve Master equation to find Ps ----------------------------------- #
-
-
 def Master_eq(A):
+    """ Solve Master equation to find steady state probablities """
 
     for i in range(0,N):
         A[i,i]=-np.sum(A[:,i])
 
     P_all=null(A)
 
-#print "P: ", P_all
-
     return P_all
 
 
-
-# ----------------- Mobility from velocity (can only be calculated in prescence of a field) ------------ #
-
-
-def Mob(A,P_all,field_unit):
+def mob(A,P_all,field_unit,F_mag):
+    """ Find mobility by calculating velocity. Can only be used for field strength != 0 """
 
 	V=np.zeros(3)       # Find velocity vector
 
@@ -132,158 +120,160 @@ def Mob(A,P_all,field_unit):
 
 	V_F=np.dot(V,field_unit)       # V in direction of field
 
-	mu = (V_F/F_mag)/hbar                # Mobility in cm^2/Vs
+	mu = (V_F/F_mag)/HBAR                # Mobility in cm^2/Vs
     
 	print "Mobility= ", mu, " cm^2/Vs"
 
 	return mu
 
 
-# ------------------------------------ Mobility from Einstein relation --------------------------------- #
-
-def Mob_einstein(A,P_all,theta,plane):
+def mob_einstein(A,P_all,field):
+    """ Find mobility from Einstein relation. Can be used even for zero field. """
 
     # Calculate D. Initialise.
-    D=0
-
-    # Unit vector to calculate mobility in the direction of
-
-    if plane=='ab':
-        unit_vec = [np.cos(theta),np.sin(theta),0]
-    elif plane=='bc':
-        unit_vec = [0,np.cos(theta),np.sin(theta)]
-    elif plane=='ac':
-        unit_vec = [np.cos(theta),0,np.sin(theta)]
-
+    D = 0
 
     for i in range(0,N):
         for j in range(0,N):
-            D+=0.5*P_all[i]*A[j,i]*(np.dot(distancematrix[j,i,:],unit_vec))**2
+            D += 0.5*P_all[i]*A[j,i]*(np.dot(distancematrix[j,i,:],field))**2
 
-    mu_ein= ((e*D)/(kb*T))/hbar
+    mu_ein = ((e*D)/(KB*T))/HBAR
 
     print "Mobility from Einstein relation= ", mu_ein, " cm^2/Vs"
 
-
     return mu_ein
 
-# -------------------------------------- Plot mobility vs angle  --------------------------------------- #
+
+def change_field(Js_all,F_mag):
+    """ Apply field at 10 degree angles in each of the 3 orthogonal planes """
+    
+    mobilities_ab = []
+    mobilities_bc = []
+    mobilities_ac = []
+
+    for angle in np.linspace(0,2*np.pi,36):
+        Field_ab=[F_mag*np.cos(angle),F_mag*np.sin(angle),0]
+        Field_bc=[0,F_mag*np.cos(angle),F_mag*np.sin(angle)]
+        Field_ac=[F_mag*np.cos(angle),0,F_mag*np.sin(angle)]
+        
+        A_ab = Marcus_rates(Js_all,Field_ab)
+        A_bc = Marcus_rates(Js_all,Field_bc)
+        A_ac = Marcus_rates(Js_all,Field_ac)
+        
+        P_ab = Master_eq(A_ab)
+        P_bc = Master_eq(A_ab)
+        P_ac = Master_eq(A_ab)
+
+        if mob_type=='mob':
+            mob_ab = mob(A_ab,P_ab,Field_ab/np.linalg.norm(Field_ab),F_mag)
+            mob_bc = mob(A_bc,P_bc,Field_bc/np.linalg.norm(Field_bc),F_mag)
+            mob_ac = mob(A_ac,P_ac,Field_ac/np.linalg.norm(Field_ac),F_mag)
+        
+        if mob_type=='mob_einstein':
+            mob_ab = mob_einstein(A_ab,P_ab,Field_ab/np.linalg.norm(Field_ab))
+            mob_bc = mob_einstein(A_bc,P_bc,Field_bc/np.linalg.norm(Field_bc))
+            mob_ac = mob_einstein(A_ac,P_ac,Field_ac/np.linalg.norm(Field_ac))
+        
+        mobilities_ab = np.append(mobilities_ab,mob_ab)
+        mobilities_bc = np.append(mobilities_bc,mob_bc)
+        mobilities_ac = np.append(mobilities_ac,mob_ac)
+    
+    return np.array(mobilities_ab),np.array(mobilities_bc),np.array(mobilities_ac)
 
 
-def Plot_mobility(Angles,Mobilities,plane,Max_mob):
-
-    print "average: ", np.mean(np.absolute(Mobilities))
-
-    print "min: ", np.min(np.absolute(Mobilities))
-
-    print "max: ", np.max(np.absolute(Mobilities))
-
-    fig=pl.figure()
-
+def plot_mobility(av_mob_ab,av_mob_bc,av_mob_ac,filename):
+    """ Plot the mobility on a polar plot """
+    
+    max_mob = np.max([av_mob_ab,av_mob_bc,av_mob_ac])
+    min_mob = np.min([av_mob_ab,av_mob_bc,av_mob_ac])
+    av_mob = np.mean([av_mob_ab,av_mob_bc,av_mob_ac])
+    
+    print "Max mobility: ", max_mob
+    print "Min mobility: ", min_mob
+    print "Average mobility: ", av_mob
+    
+    fig1=pl.figure()
+    
     ax=pl.subplot(111, polar=True)
-    ax.plot(Angles,Mobilities,'o',label='Mobility (cm$^2$V$^{-1}$s$^{-1}$)')
+    ax.plot(np.linspace(0,2*np.pi,36),av_mob_ab,'o',label='Mobility (cm$^2$V$^{-1}$s$^{-1}$)')
     ax.grid(True)
-    ax.set_rmax(Max_mob)
+    ax.set_rmax(max_mob)
     ax.legend(loc='upper left', bbox_to_anchor=(-0.2,1.1))
-
-#    pl.show()
-    fig.savefig("%s_%s_mobility_%s.png"%(filename,carrier,plane))
-
-
-#------------------------------  Read in data/ set constants and variables ----------------------------- #
-
-
-# Load data
-
-coordfile=np.loadtxt(sys.argv[1]) # read in coordinate file (in Angstroms)
-Jif=np.loadtxt(sys.argv[2])		  # Read in J file (with columns $i $j J)
-carrier=sys.argv[3]
-F_mag=float(sys.argv[4])          # Magnitude of field vector (in V/cm). Set to zero for no field.
-filename=sys.argv[5]
-N=len(coordfile)                  # Number of molecules
-
-# Define constants
-
-Lambda_inner=0.1               # Define inner and outer reorganisation energies
-Lambda_outer=0.2
-hbar=6.582*10**-16             # in eV.s
-e=1                            # Charge on electron in eV/V
-kb=8.617*10**-5				   # in eV/K
-T=300                          # in K
-M=N/27      				   # M = number of molecules in unit cell (for 3x3x3 supercell)
-
-#print M
-
-Lambda=Lambda_inner+Lambda_outer  # Calculate total lambda
-
-if carrier=='hole':
-    t=2
-
-if carrier=='electron':
-    t=3
-
-Size=len(Jif[:,2])
-
-orderedJs=np.argsort(Jif[:,t])
-
-#print "Top Js: ", Jif[orderedJs[Size-10:Size],2], "at", Jif[orderedJs[Size-10:Size],0], Jif[orderedJs[Size-10:Size],1]
-
-print "Max J: ", np.max(Jif[:,t])
-
-Js=np.zeros((N,N))              # Set up Js in matrix
-
-for i in range(0,Size):
-    Js[int(Jif[i,0]),int(Jif[i,1])]=Jif[i,t]
-    Js[int(Jif[i,1]),int(Jif[i,0])]=Jif[i,t]
-
-coordfile=coordfile*10**-8     # Convert from Angstroms to cm
-
-distancematrix=coordfile[:,None,...]-coordfile[None,...]
-
-#print distancematrix
-
-J_all=fill_Js(Js)
-
-Mob_ab=[]
-Mob_bc=[]
-Mob_ac=[]
-angles=[]
-
-
-for theta in np.linspace(0,2*np.pi,36):
-    FIELDab=[F_mag*np.cos(theta),F_mag*np.sin(theta),0]
-    FIELDbc=[0,F_mag*np.cos(theta),F_mag*np.sin(theta)]
-    FIELDac=[F_mag*np.cos(theta),0,F_mag*np.sin(theta)]
     
-    FIELDab_unit=[np.cos(theta),np.sin(theta),0]
-    FIELDbc_unit=[0,np.cos(theta),np.sin(theta)]
-    FIELDac_unit=[np.cos(theta),0,np.sin(theta)]
+    pl.show()
+    fig1.savefig("%s_mobility_ab_plane.png"%(filename))
     
-    Ratesab=Marcus_rates(J_all,FIELDab)
-    Ratesbc=Marcus_rates(J_all,FIELDbc)
-    Ratesac=Marcus_rates(J_all,FIELDac)
+    fig2=pl.figure()
     
-    Pab=Master_eq(Ratesab)
-    Pbc=Master_eq(Ratesbc)
-    Pac=Master_eq(Ratesac)
+    ax=pl.subplot(111, polar=True)
+    ax.plot(np.linspace(0,2*np.pi,36),av_mob_bc,'o',label='Mobility (cm$^2$V$^{-1}$s$^{-1}$)')
+    ax.grid(True)
+    ax.set_rmax(max_mob)
+    ax.legend(loc='upper left', bbox_to_anchor=(-0.2,1.1))
     
-    mobilityab=Mob(Ratesab,Pab,FIELDab_unit)
-    mobilitybc=Mob(Ratesbc,Pbc,FIELDbc_unit)
-    mobilityac=Mob(Ratesac,Pac,FIELDac_unit)
+    pl.show()
+    fig2.savefig("%s_mobility_bc_plane.png"%(filename))
+    
+    fig3=pl.figure()
+    
+    ax=pl.subplot(111, polar=True)
+    ax.plot(np.linspace(0,2*np.pi,36),av_mob_ac,'o',label='Mobility (cm$^2$V$^{-1}$s$^{-1}$)')
+    ax.grid(True)
+    ax.set_rmax(max_mob)
+    ax.legend(loc='upper left', bbox_to_anchor=(-0.2,1.1))
+    
+    pl.show()
+    fig3.savefig("%s_mobility_ac_plane.png"%(filename))
+    
+    return 0
 
-    Mob_ab=np.append(Mob_ab,mobilityab)
-    Mob_bc=np.append(Mob_bc,mobilitybc)
-    Mob_ac=np.append(Mob_ac,mobilityac)
 
-    angles=np.append(angles,theta)
+def main():
+    """ Load data and run functions """
+
+    coordfile = np.loadtxt(sys.argv[1]) # read in coordinate file (in Angstroms)
+    Jif = np.loadtxt(sys.argv[2])		  # Read in J file (with columns $i $j J)
+    carrier = sys.argv[3]
+    F_mag = float(sys.argv[4])          # Magnitude of field vector (in V/cm)
+    filename = sys.argv[5]
+
+    N = len(coordfile)                  # Number of molecules
+
+    M=N/27      				   # M = number of molecules in unit cell (for 3x3x3 supercell)
+
+    if carrier=='hole':
+        t=2
+
+    if carrier=='electron':
+        t=3
+
+    Size = len(Jif[:,2])
+
+    orderedJs = np.argsort(Jif[:,t])
+
+    print "Top Js: ", Jif[orderedJs[Size-10:Size],2], "at", Jif[orderedJs[Size-10:Size],0], Jif[orderedJs[Size-10:Size],1]
+
+    print "Max J: ", np.max(Jif[:,t])
+
+    Js = np.zeros((N,N))              # Set up Js in matrix
+
+    for i in range(0,Size):
+        Js[int(Jif[i,0]),int(Jif[i,1])]=Jif[i,t]
+        Js[int(Jif[i,1]),int(Jif[i,0])]=Jif[i,t]
+
+    coordfile = coordfile*10**-8     # Convert from Angstroms to cm
+
+    distancematrix = coordfile[:,None,...]-coordfile[None,...]
+
+    J_all = fill_Js(Js)
+
+    mobilities_ab,mobilities_bc,mobilities_ac = change_field(Js_all,F_mag)
+
+    plot_mobility(av_mob_ab,av_mob_bc,av_mob_ac,filename)
 
 
-Max=np.max([Mob_ab,Mob_bc,Mob_ac])
+main()
 
-print "Max mobility: ", Max
 
-Plot_mobility(angles,Mob_ab,'ab',Max)
-Plot_mobility(angles,Mob_bc,'bc',Max)
-Plot_mobility(angles,Mob_ac,'ac',Max)
 
 
